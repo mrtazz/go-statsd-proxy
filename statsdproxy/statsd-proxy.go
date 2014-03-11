@@ -19,17 +19,23 @@ type StatsDMetric struct {
 }
 
 // exported functions
-func StartListener(address string, port int) error {
-	log.Printf("Starting StatsD listener on %s and port %i", address, port)
-	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(address),
-		Port: port})
+func StartListener(cfgFilePath string) error {
+  var err error
+  config, err := NewConfig(cfgFilePath)
+  if err != nil {
+		log.Printf("Error parsing config file: %s (exiting...)", err)
+		return nil
+  }
+
+	log.Printf("Starting StatsD listener on %s and port %i", config.Host, config.Port)
+	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(config.Host), Port: config.Port})
 	if err != nil {
 		log.Printf("Error setting up listener: %s (exiting...)", err)
 		return nil
 	}
 
 	relay_channel := make(chan StatsDMetric, CHANNEL_SIZE)
-  hash_ring := NewHashRing(2)
+  hash_ring := NewHashRing(len(config.Nodes))
 	go relay_metric(*hash_ring, relay_channel)
 
 	for {
