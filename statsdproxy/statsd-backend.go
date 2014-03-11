@@ -24,8 +24,9 @@ type StatsDBackend struct {
   }
 }
 
-func NewStatsDBackend(host string, port int) *StatsDBackend {
-	client := StatsDBackend{Host: host, Port: port}
+func NewStatsDBackend(host string, port int, managementPort int) *StatsDBackend {
+  client := StatsDBackend{Host: host, Port: port, ManagementPort:
+  managementPort}
   client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%s", host, port))
 	client.Open()
 	return &client
