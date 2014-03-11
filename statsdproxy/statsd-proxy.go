@@ -29,7 +29,8 @@ func StartListener(address string, port int) error {
 	}
 
 	relay_channel := make(chan StatsDMetric, CHANNEL_SIZE)
-	go relay_metric(relay_channel)
+  hash_ring := NewHashRing(2)
+	go relay_metric(*hash_ring, relay_channel)
 
 	for {
 		buf := make([]byte, 512)
@@ -89,12 +90,12 @@ func parsePacketString(data string) *StatsDMetric {
 }
 
 // relay a metric to one of the active statsd backends
-func relay_metric(relay_channel chan StatsDMetric) {
+func relay_metric(ring HashRing, relay_channel chan StatsDMetric) {
 	for {
 		select {
 		case metric := <-relay_channel:
 			// find out which backend to relay to and do it
-      backend_host, err := GetBackendForMetric(metric.name)
+      backend_host, err := ring.GetBackendForMetric(metric.name)
       if err != nil {
         log.Printf("Unable to get backend for metric: %s", metric.name)
       } else {

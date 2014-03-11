@@ -5,16 +5,26 @@ import (
 	"log"
 	"net"
 	"fmt"
+  "time"
+)
+
+const (
+  PING_CHECK_INTERVAL = 10
 )
 
 type StatsDBackend struct {
 	Host string
 	Port int
+	ManagementPort int
 	conn net.Conn
 	RingID HashRingID
+	Status struct {
+	  Alive bool
+	  LastPingTime int64
+  }
 }
 
-func New(host string, port int) *StatsDBackend {
+func NewStatsDBackend(host string, port int) *StatsDBackend {
 	client := StatsDBackend{Host: host, Port: port}
   client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%s", host, port))
 	client.Open()
@@ -42,4 +52,23 @@ func (client *StatsDBackend) Send(data string) {
 		if err != nil {
 			log.Println(err)
 		}
+}
+
+func (client *StatsDBackend) CheckAliveStatus() bool {
+  // TODO: check management console of client
+  return true
+}
+
+// function to figure out whether or not a backend is still up
+//
+// this queries the management interface of the backend to determine health
+//
+// returns false or true
+func (client *StatsDBackend) Alive() bool {
+  now := time.Now().Unix()
+  if ( now - client.Status.LastPingTime) > PING_CHECK_INTERVAL {
+    client.Status.Alive = client.CheckAliveStatus()
+    client.Status.LastPingTime = now
+  }
+  return client.Status.Alive
 }
