@@ -2,32 +2,31 @@
 package statsdproxy
 
 import (
+	"fmt"
 	"log"
 	"net"
-	"fmt"
-  "time"
+	"time"
 )
 
-const (
-  PING_CHECK_INTERVAL = 10
-)
+var healthCheckInterval int
 
 type StatsDBackend struct {
-	Host string
-	Port int
+	Host           string
+	Port           int
 	ManagementPort int
-	conn net.Conn
-	RingID HashRingID
-	Status struct {
-	  Alive bool
-	  LastPingTime int64
-  }
+	conn           net.Conn
+	RingID         HashRingID
+	Status         struct {
+		Alive        bool
+		LastPingTime int64
+	}
 }
 
-func NewStatsDBackend(host string, port int, managementPort int) *StatsDBackend {
-  client := StatsDBackend{Host: host, Port: port, ManagementPort:
-  managementPort}
-  client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%s", host, port))
+func NewStatsDBackend(host string, port int,
+	managementPort int, check_interval int) *StatsDBackend {
+	healthCheckInterval = check_interval
+	client := StatsDBackend{Host: host, Port: port, ManagementPort: managementPort}
+	client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%s", host, port))
 	client.Open()
 	return &client
 }
@@ -48,16 +47,16 @@ func (client *StatsDBackend) Close() {
 }
 
 func (client *StatsDBackend) Send(data string) {
-		update_string := fmt.Sprintf(data)
-		_, err := fmt.Fprintf(client.conn, update_string)
-		if err != nil {
-			log.Println(err)
-		}
+	update_string := fmt.Sprintf(data)
+	_, err := fmt.Fprintf(client.conn, update_string)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (client *StatsDBackend) CheckAliveStatus() bool {
-  // TODO: check management console of client
-  return true
+	// TODO: check management console of client
+	return true
 }
 
 // function to figure out whether or not a backend is still up
@@ -66,10 +65,10 @@ func (client *StatsDBackend) CheckAliveStatus() bool {
 //
 // returns false or true
 func (client *StatsDBackend) Alive() bool {
-  now := time.Now().Unix()
-  if ( now - client.Status.LastPingTime) > PING_CHECK_INTERVAL {
-    client.Status.Alive = client.CheckAliveStatus()
-    client.Status.LastPingTime = now
-  }
-  return client.Status.Alive
+	now := time.Now().Unix()
+	if (now - client.Status.LastPingTime) > int64(healthCheckInterval) {
+		client.Status.Alive = client.CheckAliveStatus()
+		client.Status.LastPingTime = now
+	}
+	return client.Status.Alive
 }
