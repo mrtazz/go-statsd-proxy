@@ -1,7 +1,7 @@
 package statsdproxy
 
 import (
-  "testing"
+	"testing"
 )
 
 func TestGetHashRingPosition(t *testing.T) {

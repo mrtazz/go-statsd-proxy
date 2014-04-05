@@ -10,7 +10,6 @@ import (
 
 var healthCheckInterval int
 
-
 type StatsDBackend struct {
 	Host           string
 	Port           int
@@ -48,14 +47,14 @@ func (client *StatsDBackend) Close() {
 }
 
 func (client *StatsDBackend) Send(data string) {
-  if DebugMode {
-    log.Printf("sending %s to backend on port %d", data, client.Port)
-  }
+	if DebugMode {
+		log.Printf("sending %s to backend on port %d", data, client.Port)
+	}
 	update_string := fmt.Sprintf(data)
 	if DebugMode {
-	  log.Println(client)
-	  log.Println(client.conn)
-  }
+		log.Println(client)
+		log.Println(client.conn)
+	}
 	_, err := fmt.Fprintf(client.conn, update_string)
 	if err != nil {
 		log.Println(err)
