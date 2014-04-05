@@ -9,5 +9,6 @@ import (
 func main() {
 	// note, that variables are pointers
 	configfile := flag.String("f", "", "config file path")
+	flag.Parse()
 	statsdproxy.StartListener(*configfile)
 }
