@@ -10,6 +10,7 @@ import (
 
 var healthCheckInterval int
 
+
 type StatsDBackend struct {
 	Host           string
 	Port           int
@@ -26,7 +27,7 @@ func NewStatsDBackend(host string, port int,
 	managementPort int, check_interval int) *StatsDBackend {
 	healthCheckInterval = check_interval
 	client := StatsDBackend{Host: host, Port: port, ManagementPort: managementPort}
-	client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%s", host, port))
+	client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%d", host, port))
 	client.Open()
 	return &client
 }
@@ -47,8 +48,14 @@ func (client *StatsDBackend) Close() {
 }
 
 func (client *StatsDBackend) Send(data string) {
-  log.Printf("sending %s to backend on port %d", data, client.Port)
+  if DebugMode {
+    log.Printf("sending %s to backend on port %d", data, client.Port)
+  }
 	update_string := fmt.Sprintf(data)
+	if DebugMode {
+	  log.Println(client)
+	  log.Println(client.conn)
+  }
 	_, err := fmt.Fprintf(client.conn, update_string)
 	if err != nil {
 		log.Println(err)

@@ -12,6 +12,8 @@ const (
 	CHANNEL_SIZE = 100
 )
 
+var DebugMode bool
+
 type StatsDMetric struct {
 	name  string
 	value float64
@@ -39,6 +41,9 @@ func StartListener(cfgFilePath string) error {
   for _, node := range config.Nodes {
     backend := NewStatsDBackend(node.Host, node.Port, node.Adminport,
     config.CheckInterval)
+    if DebugMode {
+      log.Printf("Adding backend %s:%d", backend.Host, backend.Port)
+    }
     hash_ring, err = hash_ring.Add(*backend)
     if err != nil {
       log.Println("Error adding backend to Hashring")
@@ -65,7 +70,9 @@ func StartListener(cfgFilePath string) error {
 // got sent.
 // accepts a byte array of data
 func handleConnection(data []byte, relay_channel chan StatsDMetric) {
-	log.Printf("Got packet: %s", string(data))
+  if DebugMode {
+	  log.Printf("Got packet: %s", string(data))
+  }
 	metrics := strings.Split(string(data), "\n")
 	for _, str := range metrics {
 		metric := parsePacketString(str)

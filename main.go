@@ -9,6 +9,8 @@ import (
 func main() {
 	// note, that variables are pointers
 	configfile := flag.String("f", "", "config file path")
+	debug := flag.Bool("d", false, "enable debug mode")
 	flag.Parse()
+	statsdproxy.DebugMode = *debug
 	statsdproxy.StartListener(*configfile)
 }

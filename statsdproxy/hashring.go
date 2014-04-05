@@ -56,7 +56,12 @@ func GetHashRingPosition(data string) (HashRingID, error) {
     result3 := uint32(digest[1]) << 8
     result4 := uint32(digest[0])
 
-    return HashRingID(result1 | result2 | result3 | result4), nil
+    id := result1 | result2 | result3 | result4
+    if DebugMode {
+      log.Printf("HashRingID for %s is %d", data, id)
+    }
+
+    return HashRingID(id), nil
 }
 
 // get the StatsDBackend instance that is responsible for a metric.
@@ -78,9 +83,12 @@ func (ring *HashRing) GetBackendForMetric(name string) (*StatsDBackend, error) {
     return nil, errors.New(msg)
   }
   for _, possible_backend := range *ring {
-    if metric_id < possible_backend.RingID && possible_backend.Alive() {
+    if possible_backend.Alive() && metric_id < possible_backend.RingID {
       // we only set the backend if it has a higher RingID and is alive
       backend = possible_backend
+      if DebugMode {
+        log.Printf("Backend for %s is %d", name, backend.Port)
+      }
     }
 
   }
