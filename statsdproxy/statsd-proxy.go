@@ -27,7 +27,7 @@ func StartListener(cfgFilePath string) error {
 		return nil
   }
 
-	log.Printf("Starting StatsD listener on %s and port %i", config.Host, config.Port)
+	log.Printf("Starting StatsD listener on %s and port %d", config.Host, config.Port)
 	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(config.Host), Port: config.Port})
 	if err != nil {
 		log.Printf("Error setting up listener: %s (exiting...)", err)
@@ -35,8 +35,17 @@ func StartListener(cfgFilePath string) error {
 	}
 
 	relay_channel := make(chan StatsDMetric, CHANNEL_SIZE)
-  hash_ring := NewHashRing(len(config.Nodes))
-	go relay_metric(*hash_ring, relay_channel)
+  hash_ring := *NewHashRing(len(config.Nodes))
+  for _, node := range config.Nodes {
+    backend := NewStatsDBackend(node.Host, node.Port, node.Adminport,
+    config.CheckInterval)
+    hash_ring, err = hash_ring.Add(*backend)
+    if err != nil {
+      log.Println("Error adding backend to Hashring")
+      log.Println(err)
+    }
+  }
+	go relay_metric(hash_ring, relay_channel)
 
 	for {
 		buf := make([]byte, 512)

@@ -47,6 +47,7 @@ func (client *StatsDBackend) Close() {
 }
 
 func (client *StatsDBackend) Send(data string) {
+  log.Printf("sending %s to backend on port %d", data, client.Port)
 	update_string := fmt.Sprintf(data)
 	_, err := fmt.Fprintf(client.conn, update_string)
 	if err != nil {
