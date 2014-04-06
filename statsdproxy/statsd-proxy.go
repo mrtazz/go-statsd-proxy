@@ -21,13 +21,30 @@ type StatsDMetric struct {
 }
 
 // exported functions
-func StartListener(cfgFilePath string) error {
+func StartProxy(cfgFilePath string) error {
 	var err error
 	config, err := NewConfig(cfgFilePath)
 	if err != nil {
 		log.Printf("Error parsing config file: %s (exiting...)", err)
 		return nil
 	}
+	timeout := make(chan bool, 1)
+
+	go StartMainListener(*config)
+	go StartManagementConsole(*config)
+
+	select {
+	case <-timeout:
+		// the read from ch has timed out
+	}
+
+	return nil
+
+}
+
+// function to set up the main UDP listener. Everything that is needed to
+// receive and relay metrics
+func StartMainListener(config ProxyConfig) error {
 
 	log.Printf("Starting StatsD listener on %s and port %d", config.Host, config.Port)
 	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(config.Host), Port: config.Port})

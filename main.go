@@ -12,5 +12,5 @@ func main() {
 	debug := flag.Bool("d", false, "enable debug mode")
 	flag.Parse()
 	statsdproxy.DebugMode = *debug
-	statsdproxy.StartListener(*configfile)
+	statsdproxy.StartProxy(*configfile)
 }

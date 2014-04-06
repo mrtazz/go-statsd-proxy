@@ -16,10 +16,11 @@ type StatsdConfigNode struct {
 
 // struct to represent the whole JSON config file
 type ProxyConfig struct {
-	Host          string             `json:host`
-	Port          int                `json:port`
-	CheckInterval int                `json:checkInterval`
-	Nodes         []StatsdConfigNode `json:nodes`
+	Host           string             `json:host`
+	Port           int                `json:port`
+	ManagementPort int                `json:managementPort`
+	CheckInterval  int                `json:checkInterval`
+	Nodes          []StatsdConfigNode `json:nodes`
 }
 
 // constructor function to create a new config struct with values

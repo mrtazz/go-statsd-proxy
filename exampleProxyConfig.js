@@ -6,5 +6,6 @@
   ],
   "host":  "0.0.0.0",
   "port": 8125,
+  "managementport": 8126,
   "checkInterval": 1000
 }
