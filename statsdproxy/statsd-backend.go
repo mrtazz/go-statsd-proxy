@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,7 @@ type StatsDBackend struct {
 	Port           int
 	ManagementPort int
 	conn           net.Conn
+	ManagementConn net.Conn
 	RingID         HashRingID
 	Status         struct {
 		Alive        bool
@@ -28,6 +30,7 @@ func NewStatsDBackend(host string, port int,
 	client := StatsDBackend{Host: host, Port: port, ManagementPort: managementPort}
 	client.RingID, _ = GetHashRingPosition(fmt.Sprintf("%s:%d", host, port))
 	client.Open()
+	client.OpenManagementConnection()
 	return &client
 }
 
@@ -39,6 +42,16 @@ func (client *StatsDBackend) Open() {
 		log.Println(err)
 	}
 	client.conn = conn
+}
+
+// method to open TCP connection to the management port
+func (client *StatsDBackend) OpenManagementConnection() {
+	connectionString := fmt.Sprintf("%s:%d", client.Host, client.ManagementPort)
+	conn, err := net.Dial("tcp", connectionString)
+	if err != nil {
+		log.Println(err)
+	}
+	client.ManagementConn = conn
 }
 
 // Method to close udp connection
@@ -58,8 +71,37 @@ func (client *StatsDBackend) Send(data string) {
 }
 
 func (client *StatsDBackend) CheckAliveStatus() bool {
-	// TODO: check management console of client
-	return true
+	if DebugMode {
+		log.Printf("checking backend on %s:%d", client.Host, client.Port)
+	}
+	update_string := fmt.Sprintf("health")
+	_, err := fmt.Fprintf(client.ManagementConn, update_string)
+	if err != nil {
+		log.Println(err)
+	}
+	reply := make([]byte, 1024)
+
+	_, err = client.ManagementConn.Read(reply)
+	if err != nil {
+		log.Printf("Write to server failed:", err.Error())
+	}
+	health_status := strings.Trim(string(reply), string(0))
+
+	if DebugMode {
+		log.Printf("Response from backend %s:%d: %s", client.Host,
+			client.ManagementPort, health_status)
+	}
+	if strings.Contains(health_status, "up") {
+		if DebugMode {
+			log.Printf("backend at %s:%d is up", client.Host, client.ManagementPort)
+		}
+		return true
+	} else {
+		if DebugMode {
+			log.Printf("backend at %s:%d is down", client.Host, client.ManagementPort)
+		}
+		return false
+	}
 }
 
 // function to figure out whether or not a backend is still up
@@ -70,6 +112,10 @@ func (client *StatsDBackend) CheckAliveStatus() bool {
 func (client *StatsDBackend) Alive() bool {
 	now := time.Now().Unix()
 	if (now - client.Status.LastPingTime) > int64(healthCheckInterval) {
+		if DebugMode {
+			log.Printf("Checking alive status on backend %s:%d", client.Host,
+				client.ManagementPort)
+		}
 		client.Status.Alive = client.CheckAliveStatus()
 		client.Status.LastPingTime = now
 	}

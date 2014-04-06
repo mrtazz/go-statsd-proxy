@@ -27,7 +27,7 @@ func NewHashRing() *HashRing {
 // returns the sorted hashring with the newly appended server and error
 func (ring *HashRing) Add(backend StatsDBackend) (HashRing, error) {
 	if !backend.Alive() {
-		err_msg := fmt.Sprintf("Backend %s:%s doesn't seem to be alive.", backend.Host,
+		err_msg := fmt.Sprintf("Backend %s:%d doesn't seem to be alive.", backend.Host,
 			backend.Port)
 		return *ring, errors.New(err_msg)
 	}
