@@ -12,7 +12,7 @@ Probably a lot, submit them
 
 ## Contributing
 Take a look at [the
-guidelines](https://github.com/mrtazz/go-statsd-proxy/tree/master/Contributing.md).
+guidelines](https://github.com/mrtazz/go-statsd-proxy/blob/master/CONTRIBUTING.md).
 
 
 [statsd-proxy]: https://github.com/etsy/statsd/blob/master/proxy.js
