@@ -18,6 +18,10 @@ go build
 Probably a lot, submit them
 [here](https://github.com/mrtazz/go-statsd-proxy/issues).
 
+There is also a debug mode included which probably makes a lot of noise
+depending on how many metrics you send. So be warned. It can be enabled by
+running the proxy with the `-d` flag.
+
 ## Contributing
 Take a look at [the
 guidelines](https://github.com/mrtazz/go-statsd-proxy/blob/master/CONTRIBUTING.md).
