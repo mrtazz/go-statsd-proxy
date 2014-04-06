@@ -121,10 +121,12 @@ func relay_metric(ring HashRing, relay_channel chan StatsDMetric) {
 			if err != nil {
 				log.Printf("Unable to get backend for metric: %s", metric.name)
 			} else {
+				if DebugMode {
+					log.Printf("relaying metric: %s to %s:%d", metric.raw,
+						backend_host.Host, backend_host.Port)
+				}
 				backend_host.Send(metric.raw)
 			}
-
-			log.Printf("relaying metric: %s", metric.name)
 		}
 	}
 }

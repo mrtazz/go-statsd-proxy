@@ -1,0 +1,4 @@
+[
+    { "raw": "foo:1|ms", "name": "foo", "value": 1, "samplerate": 1 },
+    { "raw": "bar:1|ms@0.1", "name": "bar", "value": 1, "samplerate": 0.1}
+]

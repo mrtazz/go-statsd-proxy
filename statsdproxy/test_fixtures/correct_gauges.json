@@ -1,0 +1,5 @@
+[
+    { "raw": "foo:1|g", "name": "foo", "value": 1, "samplerate": 1 },
+    { "raw": "bar:-1|g", "name": "bar", "value": -1, "samplerate": 1},
+    { "raw": "bar:+1|g", "name": "bar", "value": 1, "samplerate": 1}
+]

@@ -82,6 +82,9 @@ func (ring *HashRing) GetBackendForMetric(name string) (*StatsDBackend, error) {
 		msg := fmt.Sprintf("Unable to get hashring position for %s", name)
 		return nil, errors.New(msg)
 	}
+	if DebugMode {
+		log.Printf("Choosing backend from %v", *ring)
+	}
 	for _, possible_backend := range *ring {
 		if possible_backend.Alive() && metric_id < possible_backend.RingID {
 			// we only set the backend if it has a higher RingID and is alive
