@@ -17,8 +17,8 @@ const (
 type HashRingID uint32
 type HashRing []StatsDBackend
 
-func NewHashRing(size int) *HashRing {
-	ret := make(HashRing, size, MAXRINGSIZE)
+func NewHashRing() *HashRing {
+	ret := make(HashRing, 0, MAXRINGSIZE)
 	return &ret
 }
 
@@ -89,11 +89,11 @@ func (ring *HashRing) GetBackendForMetric(name string) (*StatsDBackend, error) {
 		if possible_backend.Alive() && metric_id < possible_backend.RingID {
 			// we only set the backend if it has a higher RingID and is alive
 			backend = possible_backend
-			if DebugMode {
-				log.Printf("Backend for %s is %d", name, backend.Port)
-			}
 		}
 
+	}
+	if DebugMode {
+		log.Printf("Backend for %s is %d", name, backend.Port)
 	}
 
 	return &backend, nil

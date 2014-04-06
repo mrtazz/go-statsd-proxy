@@ -37,7 +37,7 @@ func StartListener(cfgFilePath string) error {
 	}
 
 	relay_channel := make(chan StatsDMetric, CHANNEL_SIZE)
-	hash_ring := *NewHashRing(len(config.Nodes))
+	hash_ring := *NewHashRing()
 	for _, node := range config.Nodes {
 		backend := NewStatsDBackend(node.Host, node.Port, node.Adminport,
 			config.CheckInterval)
