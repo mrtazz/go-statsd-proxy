@@ -14,6 +14,39 @@ go build
 ./go-statsd-proxy -f exampleConfig.json
 ```
 
+## Monitoring
+The proxy has a management interface accessible via TCP (inspired by the
+StatsD interface) which can be used for monitoring and accessing some stats
+about the running process. By default the interface runs on port 8126.
+
+### Ping
+This can be used as a basic health check to see if the server is still
+responding. It's not really detailed or granular but may change in the future.
+```
+% echo "ping" | nc -w1 localhost 8126                                                                                                                                                           <master ✗>
+pong
+```
+
+### Memstats
+This command fives you an overview over the most important memory stats. Use
+this to feed instance metrics into ganglia for example:
+
+```
+% echo "memstats" | nc -w1 localhost 8126
+bytes allocated and in use: 292432
+bytes allocated total: 363088
+bytes obtained from system: 4331752
+number of pointer lookups: 1091
+number of mallocs: 874
+number of frees: 565
+bytes allocated and still in use: 292432
+bytes obtained from system: 292432
+bytes in idle spans: 610304
+bytes in non-idle span: 438272
+bytes released to the OS: 610304
+total number of allocated objects: 309
+```
+
 ## Bugs
 Probably a lot, submit them
 [here](https://github.com/mrtazz/go-statsd-proxy/issues).
