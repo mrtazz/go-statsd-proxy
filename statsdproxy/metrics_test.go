@@ -7,28 +7,36 @@ import (
 func TestAnswerPing(t *testing.T) {
 	answer := answerManagementQuery("ping")
 
-	if answer != "pong" {
-		t.Errorf("wrong answer, expected 'pong' and got %s", answer)
+	for _, v := range answer {
+		if v != "pong" {
+			t.Errorf("wrong answer, expected 'pong' and got %s", v)
+		}
 	}
 }
 func TestAnswerPingWithSpaces(t *testing.T) {
 	answer := answerManagementQuery("ping ")
 
-	if answer != "pong" {
-		t.Errorf("wrong answer, expected 'pong' and got %s", answer)
+	for _, v := range answer {
+		if v != "pong" {
+			t.Errorf("wrong answer, expected 'pong' and got %s", v)
+		}
 	}
 }
 func TestAnswerUnknownCommand(t *testing.T) {
 	answer := answerManagementQuery("lerlo")
 
-	if answer != "unknown command" {
-		t.Errorf("wrong answer, expected 'unknown command' and got %s", answer)
+	for _, v := range answer {
+		if v != "unknown command" {
+			t.Errorf("wrong answer, expected 'unknown command' and got %s", v)
+		}
 	}
 }
 func TestAnswerPingWithNewlines(t *testing.T) {
 	answer := answerManagementQuery("ping\r\n")
 
-	if answer != "pong" {
-		t.Errorf("wrong answer, expected 'pong' and got %s", answer)
+	for _, v := range answer {
+		if v != "pong" {
+			t.Errorf("wrong answer, expected 'pong' and got %s", v)
+		}
 	}
 }
