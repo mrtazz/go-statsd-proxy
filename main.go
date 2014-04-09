@@ -12,5 +12,7 @@ func main() {
 	debug := flag.Bool("d", false, "enable debug mode")
 	flag.Parse()
 	statsdproxy.DebugMode = *debug
-	statsdproxy.StartProxy(*configfile)
+  // TODO: catch sigterm and actually tell the process to quit
+  quit := make(chan bool)
+	statsdproxy.StartProxy(*configfile, quit)
 }

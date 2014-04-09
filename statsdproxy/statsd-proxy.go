@@ -12,7 +12,11 @@ const (
 	CHANNEL_SIZE = 100
 )
 
+// variable to indicate whether or not we run in DebugMode
 var DebugMode bool
+// channel to gather internal metrics
+var internalMetrics chan StatsDMetric
+var metricsOutput chan metricsRequest
 
 type StatsDMetric struct {
 	name  string
@@ -21,22 +25,22 @@ type StatsDMetric struct {
 }
 
 // exported functions
-func StartProxy(cfgFilePath string) error {
+func StartProxy(cfgFilePath string, quit chan bool) error {
 	var err error
 	config, err := NewConfig(cfgFilePath)
 	if err != nil {
 		log.Printf("Error parsing config file: %s (exiting...)", err)
 		return nil
 	}
-	timeout := make(chan bool, 1)
+	internalMetrics = make(chan StatsDMetric, CHANNEL_SIZE)
+	metricsOutput = make(chan metricsRequest, CHANNEL_SIZE)
 
+  go metricsCollector(internalMetrics)
 	go StartMainListener(*config)
 	go StartManagementConsole(*config)
 
-	select {
-	case <-timeout:
-		// the read from ch has timed out
-	}
+  // wait until you're told to quit
+	<-quit
 
 	return nil
 
@@ -93,6 +97,7 @@ func handleConnection(data []byte, relay_channel chan StatsDMetric) {
 	metrics := strings.Split(string(data), "\n")
 	for _, str := range metrics {
 		metric := parsePacketString(str)
+		internalMetrics <- *metric
 		relay_channel <- *metric
 	}
 
