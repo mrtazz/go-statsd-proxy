@@ -98,7 +98,7 @@ func handleConnection(data []byte, relay_channel chan StatsDMetric) {
 	metrics := strings.Split(string(data), "\n")
 	for _, str := range metrics {
 		metric := parsePacketString(str)
-		internalMetrics <- *metric
+		internalMetrics <- StatsDMetric{name: "packets_received", value: 1}
 		relay_channel <- *metric
 	}
 

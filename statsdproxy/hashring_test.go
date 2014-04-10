@@ -15,3 +15,10 @@ func TestGetHashRingPosition(t *testing.T) {
 		t.Errorf("wrong id returned, expected 3675831724 and got %d", id)
 	}
 }
+
+// Benchmarks
+func BenchmarkGetHashRingPosition(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		GetHashRingPosition("foo")
+	}
+}

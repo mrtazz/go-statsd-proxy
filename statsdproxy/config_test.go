@@ -52,3 +52,24 @@ func TestReadConfigFile_BasicData(t *testing.T) {
 	}
 
 }
+
+// Benchmarks
+func BenchmarkReadConfigFile(b *testing.B) {
+	const testConfig = `
+    {
+      "nodes": [
+        {"host": "127.0.0.1", "port": 8129, "adminport": 8126},
+        {"host": "127.0.0.1", "port": 8127, "adminport": 8128},
+        {"host": "127.0.0.1", "port": 8129, "adminport": 8130}
+      ],
+      "host":  "0.0.0.0",
+      "port": 8125,
+      "checkInterval": 1000,
+      "cacheSize": 10000
+    }
+    `
+
+	for i := 0; i < b.N; i++ {
+		readConfigFile([]byte(testConfig))
+	}
+}
