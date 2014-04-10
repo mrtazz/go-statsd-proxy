@@ -27,6 +27,16 @@ responding. It's not really detailed or granular but may change in the future.
 pong
 ```
 
+### Stats
+This command gives you an overview over some of the internal stats of the
+running proxy:
+
+```
+% echo -n "stats" | nc -w1 127.0.01 8126
+time running in seconds: 51
+packets_received: 1.000000
+```
+
 ### Memstats
 This command fives you an overview over the most important memory stats. Use
 this to feed instance metrics into ganglia for example:
