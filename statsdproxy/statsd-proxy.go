@@ -14,6 +14,7 @@ const (
 
 // variable to indicate whether or not we run in DebugMode
 var DebugMode bool
+
 // channel to gather internal metrics
 var internalMetrics chan StatsDMetric
 var metricsOutput chan metricsRequest
@@ -35,11 +36,11 @@ func StartProxy(cfgFilePath string, quit chan bool) error {
 	internalMetrics = make(chan StatsDMetric, CHANNEL_SIZE)
 	metricsOutput = make(chan metricsRequest, CHANNEL_SIZE)
 
-  go metricsCollector(internalMetrics)
+	go metricsCollector(internalMetrics)
 	go StartMainListener(*config)
 	go StartManagementConsole(*config)
 
-  // wait until you're told to quit
+	// wait until you're told to quit
 	<-quit
 
 	return nil
