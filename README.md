@@ -1,4 +1,4 @@
-# go-statsd-proxy
+# go-statsd-proxy [![Build Status](https://travis-ci.org/mrtazz/go-statsd-proxy.svg?branch=master)](https://travis-ci.org/mrtazz/go-statsd-proxy)
 
 ## Overview
 A proxy for multiple statsd backends that routes metrics to specific instances
