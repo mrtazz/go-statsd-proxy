@@ -9,6 +9,7 @@ import (
 	"net"
 	"runtime"
 	"strings"
+	"time"
 )
 
 const (
@@ -105,6 +106,7 @@ func getMemStats() Answers {
 func metricsCollector(metricsChannel chan StatsDMetric) {
 
 	metrics := make(MetricsCollection)
+	start_time := time.Now().Unix()
 
 	for {
 		select {
@@ -119,6 +121,8 @@ func metricsCollector(metricsChannel chan StatsDMetric) {
 			}
 		case request := <-metricsOutput:
 			var out []string
+			out = append(out, fmt.Sprintf("time running in seconds: %d",
+				(time.Now().Unix()-start_time)))
 			for key, value := range metrics {
 				out = append(out, fmt.Sprintf("%s: %f", key, value))
 			}

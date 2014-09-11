@@ -1,4 +1,4 @@
-# go-statsd-proxy
+# go-statsd-proxy [![Build Status](https://travis-ci.org/mrtazz/go-statsd-proxy.svg?branch=master)](https://travis-ci.org/mrtazz/go-statsd-proxy)
 
 ## Overview
 A proxy for multiple statsd backends that routes metrics to specific instances
@@ -25,6 +25,16 @@ responding. It's not really detailed or granular but may change in the future.
 ```
 % echo "ping" | nc -w1 localhost 8126                                                                                                                                                           <master ✗>
 pong
+```
+
+### Stats
+This command gives you an overview over some of the internal stats of the
+running proxy:
+
+```
+% echo -n "stats" | nc -w1 127.0.01 8126
+time running in seconds: 51
+packets_received: 1.000000
 ```
 
 ### Memstats
