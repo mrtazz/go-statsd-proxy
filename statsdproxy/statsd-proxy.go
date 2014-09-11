@@ -75,11 +75,11 @@ func StartMainListener(config ProxyConfig) error {
 	}
 	go relay_metric(hash_ring, relay_channel)
 
-  worker_channel := make(chan []byte)
+	worker_channel := make(chan []byte)
 
-  for x := 0; x < WORKER_COUNT; x++ {
-			go handleConnection(worker_channel, relay_channel)
-  }
+	for x := 0; x < WORKER_COUNT; x++ {
+		go handleConnection(worker_channel, relay_channel)
+	}
 
 	for {
 		buf := make([]byte, 512)
@@ -88,7 +88,7 @@ func StartMainListener(config ProxyConfig) error {
 			log.Printf("Error reading from UDP buffer: %s (skipping...)", err)
 			return nil
 		} else {
-      worker_channel <- buf[0:num]
+			worker_channel <- buf[0:num]
 		}
 	}
 
@@ -101,18 +101,18 @@ func StartMainListener(config ProxyConfig) error {
 func handleConnection(data_channel chan []byte, relay_channel chan StatsDMetric) {
 	for {
 		select {
-		case data := <- data_channel:
-      if DebugMode {
-        log.Printf("Got packet: %s", string(data))
-      }
-      metrics := strings.Split(string(data), "\n")
-      for _, str := range metrics {
-        metric := parsePacketString(str)
-        internalMetrics <- StatsDMetric{name: "packets_received", value: 1}
-        relay_channel <- *metric
-      }
+		case data := <-data_channel:
+			if DebugMode {
+				log.Printf("Got packet: %s", string(data))
+			}
+			metrics := strings.Split(string(data), "\n")
+			for _, str := range metrics {
+				metric := parsePacketString(str)
+				internalMetrics <- StatsDMetric{name: "packets_received", value: 1}
+				relay_channel <- *metric
+			}
 
-        }
+		}
 	}
 }
 
