@@ -1,5 +1,7 @@
 # go-statsd-proxy [![Build Status](https://travis-ci.org/mrtazz/go-statsd-proxy.svg?branch=master)](https://travis-ci.org/mrtazz/go-statsd-proxy)
 
+## This project is unmaintained. YMMV
+
 ## Overview
 A proxy for multiple statsd backends that routes metrics to specific instances
 via consistent hashing. This is basically a reimplementation of the proxy
